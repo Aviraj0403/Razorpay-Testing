@@ -8,11 +8,11 @@ export default function Home() {
 
   const handlePayment = async () => {
     setIsLoading(true);
-
+  
     try {
       const token = localStorage.getItem("token"); // optional JWT from login
-
-      const res = await fetch('http://localhost:5000/api/orders/create', {
+  
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/payment/createRazorpayOrder`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -22,10 +22,10 @@ export default function Home() {
           shippingAddress,
         }),
       });
-
+  
       const data = await res.json();
       const orderId = data.razorpayOrderId;
-
+  
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: data.amount * 100,
@@ -34,7 +34,7 @@ export default function Home() {
         description: 'Secure Payment',
         order_id: orderId,
         handler: async function (response) {
-          const verifyRes = await fetch('http://localhost:5000/api/payment/verify', {
+          const verifyRes = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/payment/verifyPayment`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ export default function Home() {
               shippingAddress,
             }),
           });
-
+  
           const result = await verifyRes.json();
           if (result.message === 'Payment verified successfully') {
             alert('Payment Success!');
@@ -56,15 +56,15 @@ export default function Home() {
           }
         },
         prefill: {
-          name: 'John Doe',
-          email: 'john@example.com',
+          name: 'AviRaj',
+          email: 'aviraj0403@gmail.com',
           contact: '9876543210',
         },
         theme: {
           color: '#3399cc',
         },
       };
-
+  
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (error) {
@@ -74,6 +74,7 @@ export default function Home() {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div style={{ padding: '2rem', maxWidth: '400px', margin: 'auto' }}>
