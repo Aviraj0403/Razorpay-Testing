@@ -5,22 +5,41 @@ export default function Home() {
   const [amount, setAmount] = useState('');
   const [shippingAddress, setShippingAddress] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
+  
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
+  };
+  
   const handlePayment = async () => {
     setIsLoading(true);
   
+    const isScriptLoaded = await loadRazorpayScript();
+    if (!isScriptLoaded) {
+      alert('Failed to load Razorpay SDK. Please try again.');
+      setIsLoading(false);
+      return;
+    }
+  
     try {
-      const token = localStorage.getItem("token"); // optional JWT from login
+      const token = localStorage.getItem("token");
   
       const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/payment/createRazorpayOrder`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          shippingAddress,
-        }),
+        body: JSON.stringify({ shippingAddress }),
       });
   
       const data = await res.json();
@@ -38,7 +57,7 @@ export default function Home() {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`
+              Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
               razorpay_order_id: response.razorpay_order_id,
@@ -56,8 +75,8 @@ export default function Home() {
           }
         },
         prefill: {
-          name: 'AviRaj',
-          email: 'aviraj0403@gmail.com',
+          name: 'John Doe',
+          email: 'john@example.com',
           contact: '9876543210',
         },
         theme: {
@@ -74,6 +93,7 @@ export default function Home() {
       setIsLoading(false);
     }
   };
+  
   
 
   return (

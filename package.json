@@ -1,4 +1,3 @@
-
 {
   "name": "nextjs-razorpay-app",
   "version": "1.0.0",
@@ -9,8 +8,8 @@
   },
   "dependencies": {
     "next": "latest",
+    "razorpay": "^2.9.6",
     "react": "latest",
-    "react-dom": "latest",
-    "razorpay": "^2.8.5"
+    "react-dom": "latest"
   }
 }
